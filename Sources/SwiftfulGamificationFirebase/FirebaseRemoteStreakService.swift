@@ -15,29 +15,25 @@ public struct FirebaseRemoteStreakService: RemoteStreakService {
 
     private let streakId: String
 
-    private var db: Firestore {
-        Firestore.firestore()
-    }
-
-    private func currentStreakDoc(userId: String) -> DocumentReference {
-        db.collection("swiftful_gamification")
+    private func userGamificationCollection(userId: String) -> CollectionReference {
+        Firestore.firestore().collection("swiftful_gamification")
             .document(userId)
             .collection(streakId)
+    }
+    
+    private func currentStreakDoc(userId: String) -> DocumentReference {
+        userGamificationCollection(userId: userId)
             .document("current_streak")
     }
 
     private func eventsCollection(userId: String) -> CollectionReference {
-        db.collection("swiftful_gamification")
-            .document(userId)
-            .collection(streakId)
+        userGamificationCollection(userId: userId)
             .document("streak_events")
             .collection("data")
     }
 
     private func freezesCollection(userId: String) -> CollectionReference {
-        db.collection("swiftful_gamification")
-            .document(userId)
-            .collection(streakId)
+        userGamificationCollection(userId: userId)
             .document("streak_freezes")
             .collection("data")
     }
@@ -57,9 +53,7 @@ public struct FirebaseRemoteStreakService: RemoteStreakService {
     }
 
     public func streamCurrentStreak(userId: String) -> AsyncThrowingStream<CurrentStreakData, Error> {
-        db.collection("swiftful_gamification")
-            .document(userId)
-            .collection(streakId)
+        userGamificationCollection(userId: userId)
             .streamDocument(id: "current_streak")
     }
 

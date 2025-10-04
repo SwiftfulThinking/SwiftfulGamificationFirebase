@@ -19,6 +19,7 @@ let package = Package(
         // Here we add the dependency for the SendableDictionary package
         .package(url: "https://github.com/SwiftfulThinking/SwiftfulGamification.git", branch: "main"),
         .package(url: "https://github.com/SwiftfulThinking/SwiftfulFirestore.git", "11.0.0"..<"12.0.0"),
+        .package(url: "https://github.com/firebase/firebase-ios-sdk.git", "12.0.0"..<"13.0.0"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -28,6 +29,7 @@ let package = Package(
             dependencies: [
                 .product(name: "SwiftfulGamification", package: "SwiftfulGamification"),
                 .product(name: "SwiftfulFirestore", package: "SwiftfulFirestore"),
+                .product(name: "FirebaseAuth", package: "firebase-ios-sdk"),
             ]
         ),
         .testTarget(
