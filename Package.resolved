@@ -1,5 +1,5 @@
 {
-  "originHash" : "99f5029b2105289004be35168dc6c1d74ea94a9d7a0cc6717b41fce4896a1cbb",
+  "originHash" : "daf87711100001a3280122010368e60c74b734d6652651f451866f684ddaf79a",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
@@ -151,7 +151,7 @@
       "location" : "https://github.com/SwiftfulThinking/SwiftfulGamification.git",
       "state" : {
         "branch" : "main",
-        "revision" : "e7f96f5b01fff29e2474ca64fe416e29b0a8625d"
+        "revision" : "023cd3f74b4586f5bf4f819ec5c7147de3695a53"
       }
     }
   ],

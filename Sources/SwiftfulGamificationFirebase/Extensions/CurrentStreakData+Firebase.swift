@@ -13,6 +13,16 @@ extension CurrentStreakData {
 
     /// Initialize from Firestore document data
     public init(firestoreData: [String: Any]) throws {
+        // Parse recent events if present
+        let recentEvents: [StreakEvent]?
+        if let eventsArray = firestoreData[CodingKeys.recentEvents.rawValue] as? [[String: Any]] {
+            recentEvents = try eventsArray.compactMap { eventData in
+                try StreakEvent(firestoreData: eventData)
+            }
+        } else {
+            recentEvents = nil
+        }
+
         self.init(
             streakId: firestoreData[CodingKeys.streakId.rawValue] as? String ?? "",
             currentStreak: firestoreData[CodingKeys.currentStreak.rawValue] as? Int,
@@ -25,7 +35,8 @@ extension CurrentStreakData {
             createdAt: (firestoreData[CodingKeys.createdAt.rawValue] as? Timestamp)?.dateValue(),
             updatedAt: (firestoreData[CodingKeys.updatedAt.rawValue] as? Timestamp)?.dateValue(),
             eventsRequiredPerDay: firestoreData[CodingKeys.eventsRequiredPerDay.rawValue] as? Int,
-            todayEventCount: firestoreData[CodingKeys.todayEventCount.rawValue] as? Int
+            todayEventCount: firestoreData[CodingKeys.todayEventCount.rawValue] as? Int,
+            recentEvents: recentEvents
         )
     }
 
@@ -67,6 +78,9 @@ extension CurrentStreakData {
         }
         if let todayEventCount = todayEventCount {
             data[CodingKeys.todayEventCount.rawValue] = todayEventCount
+        }
+        if let recentEvents = recentEvents {
+            data[CodingKeys.recentEvents.rawValue] = recentEvents.map { $0.firestoreData }
         }
 
         return data
