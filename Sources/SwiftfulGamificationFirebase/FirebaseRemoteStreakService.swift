@@ -13,25 +13,25 @@ import SwiftfulGamification
 @MainActor
 public struct FirebaseRemoteStreakService: RemoteStreakService {
 
-    private func userGamificationCollection(userId: String, streakId: String) -> CollectionReference {
-        Firestore.firestore().collection("swiftful_gamification")
+    private func userStreakCollection(userId: String, streakId: String) -> CollectionReference {
+        Firestore.firestore().collection("swiftful_streaks")
             .document(userId)
             .collection(streakId)
     }
 
     private func currentStreakDoc(userId: String, streakId: String) -> DocumentReference {
-        userGamificationCollection(userId: userId, streakId: streakId)
+        userStreakCollection(userId: userId, streakId: streakId)
             .document("current_streak")
     }
 
     private func eventsCollection(userId: String, streakId: String) -> CollectionReference {
-        userGamificationCollection(userId: userId, streakId: streakId)
+        userStreakCollection(userId: userId, streakId: streakId)
             .document("streak_events")
             .collection("data")
     }
 
     private func freezesCollection(userId: String, streakId: String) -> CollectionReference {
-        userGamificationCollection(userId: userId, streakId: streakId)
+        userStreakCollection(userId: userId, streakId: streakId)
             .document("streak_freezes")
             .collection("data")
     }
@@ -42,7 +42,7 @@ public struct FirebaseRemoteStreakService: RemoteStreakService {
     // MARK: - Current Streak
 
     public func streamCurrentStreak(userId: String, streakId: String) -> AsyncThrowingStream<CurrentStreakData, Error> {
-        userGamificationCollection(userId: userId, streakId: streakId)
+        userStreakCollection(userId: userId, streakId: streakId)
             .streamDocument(id: "current_streak")
     }
 

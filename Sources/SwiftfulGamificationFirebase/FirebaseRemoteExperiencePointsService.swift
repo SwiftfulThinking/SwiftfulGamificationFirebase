@@ -13,19 +13,19 @@ import SwiftfulGamification
 @MainActor
 public struct FirebaseRemoteExperiencePointsService: RemoteExperiencePointsService {
 
-    private func userGamificationCollection(userId: String, experienceId: String) -> CollectionReference {
-        Firestore.firestore().collection("swiftful_gamification")
+    private func userExperienceCollection(userId: String, experienceId: String) -> CollectionReference {
+        Firestore.firestore().collection("swiftful_experience")
             .document(userId)
             .collection(experienceId)
     }
 
     private func currentExperiencePointsDoc(userId: String, experienceId: String) -> DocumentReference {
-        userGamificationCollection(userId: userId, experienceId: experienceId)
+        userExperienceCollection(userId: userId, experienceId: experienceId)
             .document("current_xp")
     }
 
     private func eventsCollection(userId: String, experienceId: String) -> CollectionReference {
-        userGamificationCollection(userId: userId, experienceId: experienceId)
+        userExperienceCollection(userId: userId, experienceId: experienceId)
             .document("xp_events")
             .collection("data")
     }
@@ -36,7 +36,7 @@ public struct FirebaseRemoteExperiencePointsService: RemoteExperiencePointsServi
     // MARK: - Current Experience Points
 
     public func streamCurrentExperiencePoints(userId: String, experienceId: String) -> AsyncThrowingStream<CurrentExperiencePointsData, Error> {
-        userGamificationCollection(userId: userId, experienceId: experienceId)
+        userExperienceCollection(userId: userId, experienceId: experienceId)
             .streamDocument(id: "current_xp")
     }
 
