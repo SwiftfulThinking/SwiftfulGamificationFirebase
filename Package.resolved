@@ -1,5 +1,5 @@
 {
-  "originHash" : "daf87711100001a3280122010368e60c74b734d6652651f451866f684ddaf79a",
+  "originHash" : "ad92394903ed323650d6da7db36d6aa25b678bb7a79f71410a82f457ca48a807",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
@@ -141,8 +141,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SwiftfulThinking/SwiftfulFirestore.git",
       "state" : {
-        "revision" : "10a2983db613e463916df3f33e18e1d7a7b780d8",
-        "version" : "11.0.3"
+        "branch" : "development",
+        "revision" : "056be03845cc8ed594555f74c36c856a35e32aa5"
       }
     },
     {

@@ -11,8 +11,10 @@ import SwiftfulFirestore
 import SwiftfulGamification
 
 @MainActor
-public struct FirebaseRemoteProgressService: RemoteProgressService {
+public class FirebaseRemoteProgressService: RemoteProgressService {
 
+    private var listenerTask: Task<Void, Never>?
+    
     private func userProgressCollection(userId: String) -> CollectionReference {
         Firestore.firestore().collection("swiftful_progress")
             .document(userId)
@@ -29,20 +31,52 @@ public struct FirebaseRemoteProgressService: RemoteProgressService {
             .getAllDocuments()
     }
 
-    public func streamProgressUpdates(userId: String) -> AsyncThrowingStream<ProgressItem, Error> {
-        AsyncThrowingStream { continuation in
-            let task = Task {
-                for try await items in userProgressCollection(userId: userId).streamAllDocuments() {
-                    for item in items {
-                        continuation.yield(item)
-                    }
-                }
-            }
+    public func streamProgressUpdates(userId: String) -> (
+        updates: AsyncThrowingStream<ProgressItem, Error>,
+        deletions: AsyncThrowingStream<String, Error>
+    ) {
+        var updatesCont: AsyncThrowingStream<ProgressItem, Error>.Continuation?
+        var deletionsCont: AsyncThrowingStream<String, Error>.Continuation?
+        
+        let updates = AsyncThrowingStream<ProgressItem, Error> { continuation in
+            updatesCont = continuation
 
             continuation.onTermination = { @Sendable _ in
-                task.cancel()
+                Task {
+                    await self.listenerTask?.cancel()
+                }
             }
         }
+
+        let deletions = AsyncThrowingStream<String, Error> { continuation in
+            deletionsCont = continuation
+
+            continuation.onTermination = { @Sendable _ in
+                Task {
+                    await self.listenerTask?.cancel()
+                }
+            }
+        }
+
+        // Start the shared Firestore listener
+        listenerTask = Task {
+            do {
+                let collection = userProgressCollection(userId: userId)
+                for try await change in collection.streamAllDocumentChanges() as AsyncThrowingStream<SwiftfulFirestore.DocumentChange<ProgressItem>, Error> {
+                    switch change.type {
+                    case .added, .modified:
+                        updatesCont?.yield(change.document)
+                    case .removed:
+                        deletionsCont?.yield(change.document.id)
+                    }
+                }
+            } catch {
+                updatesCont?.finish(throwing: error)
+                deletionsCont?.finish(throwing: error)
+            }
+        }
+
+        return (updates, deletions)
     }
 
     public func updateProgress(userId: String, item: ProgressItem) async throws {
