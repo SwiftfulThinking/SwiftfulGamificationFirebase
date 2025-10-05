@@ -32,7 +32,7 @@ public struct FirebaseRemoteProgressService: RemoteProgressService {
     public func streamProgressUpdates(userId: String) -> AsyncThrowingStream<ProgressItem, Error> {
         AsyncThrowingStream { continuation in
             let task = Task {
-                for try await items in userProgressCollection(userId: userId).streamAllDocuments() as AsyncThrowingStream<[ProgressItem], Error> {
+                for try await items in userProgressCollection(userId: userId).streamAllDocuments() {
                     for item in items {
                         continuation.yield(item)
                     }
