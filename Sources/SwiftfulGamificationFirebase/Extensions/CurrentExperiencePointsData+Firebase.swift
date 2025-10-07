@@ -24,7 +24,7 @@ extension CurrentExperiencePointsData {
         }
 
         self.init(
-            experienceId: firestoreData[CodingKeys.experienceId.rawValue] as? String ?? "",
+            experienceKey: firestoreData[CodingKeys.experienceKey.rawValue] as? String ?? "",
             totalPoints: firestoreData[CodingKeys.totalPoints.rawValue] as? Int,
             totalEvents: firestoreData[CodingKeys.totalEvents.rawValue] as? Int,
             todayEventCount: firestoreData[CodingKeys.todayEventCount.rawValue] as? Int,
@@ -38,7 +38,7 @@ extension CurrentExperiencePointsData {
     /// Convert to Firestore document data
     public var firestoreData: [String: Any] {
         var data: [String: Any] = [
-            CodingKeys.experienceId.rawValue: experienceId
+            CodingKeys.experienceKey.rawValue: experienceKey
         ]
 
         if let totalPoints = totalPoints {

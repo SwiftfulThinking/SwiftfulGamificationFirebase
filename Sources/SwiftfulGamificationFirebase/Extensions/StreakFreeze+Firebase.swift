@@ -15,7 +15,7 @@ extension StreakFreeze {
     public init(firestoreData: [String: Any]) throws {
         self.init(
             id: firestoreData[CodingKeys.id.rawValue] as? String ?? UUID().uuidString,
-            streakId: firestoreData[CodingKeys.streakId.rawValue] as? String ?? "",
+            streakKey: firestoreData[CodingKeys.streakKey.rawValue] as? String ?? "",
             earnedDate: (firestoreData[CodingKeys.earnedDate.rawValue] as? Timestamp)?.dateValue(),
             usedDate: (firestoreData[CodingKeys.usedDate.rawValue] as? Timestamp)?.dateValue(),
             expiresAt: (firestoreData[CodingKeys.expiresAt.rawValue] as? Timestamp)?.dateValue()
@@ -26,7 +26,7 @@ extension StreakFreeze {
     public var firestoreData: [String: Any] {
         var data: [String: Any] = [
             CodingKeys.id.rawValue: id,
-            CodingKeys.streakId.rawValue: streakId
+            CodingKeys.streakKey.rawValue: streakKey
         ]
 
         if let earnedDate = earnedDate {

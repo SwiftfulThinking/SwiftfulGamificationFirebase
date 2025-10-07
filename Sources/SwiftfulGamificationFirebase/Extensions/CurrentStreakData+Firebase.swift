@@ -24,7 +24,7 @@ extension CurrentStreakData {
         }
 
         self.init(
-            streakId: firestoreData[CodingKeys.streakId.rawValue] as? String ?? "",
+            streakKey: firestoreData[CodingKeys.streakKey.rawValue] as? String ?? "",
             currentStreak: firestoreData[CodingKeys.currentStreak.rawValue] as? Int,
             longestStreak: firestoreData[CodingKeys.longestStreak.rawValue] as? Int,
             lastEventDate: (firestoreData[CodingKeys.lastEventDate.rawValue] as? Timestamp)?.dateValue(),
@@ -43,7 +43,7 @@ extension CurrentStreakData {
     /// Convert to Firestore document data
     public var firestoreData: [String: Any] {
         var data: [String: Any] = [
-            CodingKeys.streakId.rawValue: streakId
+            CodingKeys.streakKey.rawValue: streakKey
         ]
 
         if let currentStreak = currentStreak {

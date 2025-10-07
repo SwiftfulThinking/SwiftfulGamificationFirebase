@@ -20,7 +20,7 @@ extension ExperiencePointsEvent {
 
         self.init(
             id: firestoreData[CodingKeys.id.rawValue] as? String ?? UUID().uuidString,
-            experienceId: firestoreData[CodingKeys.experienceId.rawValue] as? String ?? "",
+            experienceKey: firestoreData[CodingKeys.experienceKey.rawValue] as? String ?? "",
             timestamp: (firestoreData[CodingKeys.timestamp.rawValue] as? Timestamp)?.dateValue() ?? Date(),
             points: firestoreData[CodingKeys.points.rawValue] as? Int ?? 0,
             metadata: metadata
@@ -31,7 +31,7 @@ extension ExperiencePointsEvent {
     public var firestoreData: [String: Any] {
         var data: [String: Any] = [
             CodingKeys.id.rawValue: id,
-            CodingKeys.experienceId.rawValue: experienceId,
+            CodingKeys.experienceKey.rawValue: experienceKey,
             CodingKeys.timestamp.rawValue: Timestamp(date: timestamp),
             CodingKeys.points.rawValue: points
         ]

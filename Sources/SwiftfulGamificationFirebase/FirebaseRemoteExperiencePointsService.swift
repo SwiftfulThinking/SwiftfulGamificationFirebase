@@ -13,19 +13,19 @@ import SwiftfulGamification
 @MainActor
 public struct FirebaseRemoteExperiencePointsService: RemoteExperiencePointsService {
 
-    private func userExperienceCollection(userId: String, experienceId: String) -> CollectionReference {
+    private func userExperienceCollection(userId: String, experienceKey: String) -> CollectionReference {
         Firestore.firestore().collection("swiftful_experience")
             .document(userId)
-            .collection(experienceId)
+            .collection(experienceKey)
     }
 
-    private func currentExperiencePointsDoc(userId: String, experienceId: String) -> DocumentReference {
-        userExperienceCollection(userId: userId, experienceId: experienceId)
+    private func currentExperiencePointsDoc(userId: String, experienceKey: String) -> DocumentReference {
+        userExperienceCollection(userId: userId, experienceKey: experienceKey)
             .document("current_xp")
     }
 
-    private func eventsCollection(userId: String, experienceId: String) -> CollectionReference {
-        userExperienceCollection(userId: userId, experienceId: experienceId)
+    private func eventsCollection(userId: String, experienceKey: String) -> CollectionReference {
+        userExperienceCollection(userId: userId, experienceKey: experienceKey)
             .document("xp_events")
             .collection("data")
     }
@@ -35,16 +35,16 @@ public struct FirebaseRemoteExperiencePointsService: RemoteExperiencePointsServi
 
     // MARK: - Current Experience Points
 
-    public func streamCurrentExperiencePoints(userId: String, experienceId: String) -> AsyncThrowingStream<CurrentExperiencePointsData, Error> {
-        userExperienceCollection(userId: userId, experienceId: experienceId)
+    public func streamCurrentExperiencePoints(userId: String, experienceKey: String) -> AsyncThrowingStream<CurrentExperiencePointsData, Error> {
+        userExperienceCollection(userId: userId, experienceKey: experienceKey)
             .streamDocument(id: "current_xp")
     }
 
-    public func updateCurrentExperiencePoints(userId: String, experienceId: String, data: CurrentExperiencePointsData) async throws {
-        try currentExperiencePointsDoc(userId: userId, experienceId: experienceId).setData(from: data, merge: true)
+    public func updateCurrentExperiencePoints(userId: String, experienceKey: String, data: CurrentExperiencePointsData) async throws {
+        try currentExperiencePointsDoc(userId: userId, experienceKey: experienceKey).setData(from: data, merge: true)
     }
 
-    public func calculateExperiencePoints(userId: String, experienceId: String) async throws {
+    public func calculateExperiencePoints(userId: String, experienceKey: String) async throws {
         // Trigger Cloud Function for server-side calculation
         // Implementation depends on your Cloud Function setup
         // For now, this is a placeholder that writes a trigger flag
@@ -52,23 +52,23 @@ public struct FirebaseRemoteExperiencePointsService: RemoteExperiencePointsServi
 //         let functions = Functions.functions()
 //         let result = try await functions.httpsCallable("calculateExperiencePoints").call([
 //             "userId": userId,
-//             "experienceId": experienceId
+//             "experienceKey": experienceKey
 //         ])
     }
 
     // MARK: - Events
 
-    public func addEvent(userId: String, experienceId: String, event: ExperiencePointsEvent) async throws {
-        try eventsCollection(userId: userId, experienceId: experienceId).document(event.id).setData(from: event, merge: false)
+    public func addEvent(userId: String, experienceKey: String, event: ExperiencePointsEvent) async throws {
+        try eventsCollection(userId: userId, experienceKey: experienceKey).document(event.id).setData(from: event, merge: false)
     }
 
-    public func getAllEvents(userId: String, experienceId: String) async throws -> [ExperiencePointsEvent] {
-        try await eventsCollection(userId: userId, experienceId: experienceId)
+    public func getAllEvents(userId: String, experienceKey: String) async throws -> [ExperiencePointsEvent] {
+        try await eventsCollection(userId: userId, experienceKey: experienceKey)
             .order(by: ExperiencePointsEvent.CodingKeys.timestamp.rawValue, descending: false)
             .getAllDocuments()
     }
 
-    public func deleteAllEvents(userId: String, experienceId: String) async throws {
-        try await eventsCollection(userId: userId, experienceId: experienceId).deleteAllDocuments()
+    public func deleteAllEvents(userId: String, experienceKey: String) async throws {
+        try await eventsCollection(userId: userId, experienceKey: experienceKey).deleteAllDocuments()
     }
 }
