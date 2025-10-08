@@ -14,11 +14,11 @@ import SwiftfulGamification
 public class FirebaseRemoteProgressService: RemoteProgressService {
 
     private var listenerTask: Task<Void, Never>?
-    
-    private func userProgressCollection(userId: String) -> CollectionReference {
+
+    private func userProgressCollection(userId: String, progressKey: String) -> CollectionReference {
         Firestore.firestore().collection("swiftful_progress")
             .document(userId)
-            .collection("items")
+            .collection(progressKey)
     }
 
     public init() {
@@ -26,12 +26,12 @@ public class FirebaseRemoteProgressService: RemoteProgressService {
 
     // MARK: - Progress Items
 
-    public func getAllProgressItems(userId: String) async throws -> [ProgressItem] {
-        try await userProgressCollection(userId: userId)
+    public func getAllProgressItems(userId: String, progressKey: String) async throws -> [ProgressItem] {
+        try await userProgressCollection(userId: userId, progressKey: progressKey)
             .getAllDocuments()
     }
 
-    public func streamProgressUpdates(userId: String) -> (
+    public func streamProgressUpdates(userId: String, progressKey: String) -> (
         updates: AsyncThrowingStream<ProgressItem, Error>,
         deletions: AsyncThrowingStream<String, Error>
     ) {
@@ -61,7 +61,7 @@ public class FirebaseRemoteProgressService: RemoteProgressService {
         // Start the shared Firestore listener
         listenerTask = Task {
             do {
-                let collection = userProgressCollection(userId: userId)
+                let collection = userProgressCollection(userId: userId, progressKey: progressKey)
                 for try await change in collection.streamAllDocumentChanges() as AsyncThrowingStream<SwiftfulFirestore.DocumentChange<ProgressItem>, Error> {
                     switch change.type {
                     case .added, .modified:
@@ -79,20 +79,20 @@ public class FirebaseRemoteProgressService: RemoteProgressService {
         return (updates, deletions)
     }
 
-    public func updateProgress(userId: String, item: ProgressItem) async throws {
-        try userProgressCollection(userId: userId)
+    public func addProgress(userId: String, progressKey: String, item: ProgressItem) async throws {
+        try userProgressCollection(userId: userId, progressKey: progressKey)
             .document(item.id)
             .setData(from: item, merge: true)
     }
 
-    public func deleteProgress(userId: String, id: String) async throws {
-        try await userProgressCollection(userId: userId)
+    public func deleteProgress(userId: String, progressKey: String, id: String) async throws {
+        try await userProgressCollection(userId: userId, progressKey: progressKey)
             .document(id)
             .delete()
     }
 
-    public func deleteAllProgress(userId: String) async throws {
-        try await userProgressCollection(userId: userId)
+    public func deleteAllProgress(userId: String, progressKey: String) async throws {
+        try await userProgressCollection(userId: userId, progressKey: progressKey)
             .deleteAllDocuments()
     }
 }
