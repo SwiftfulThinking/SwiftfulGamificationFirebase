@@ -26,6 +26,7 @@ extension CurrentExperiencePointsData {
         // Extract values to help compiler
         let experienceKey = firestoreData["experience_id"] as? String ?? ""
         let userId = firestoreData["user_id"] as? String
+        let pointsAllTime = firestoreData["points_all_time"] as? Int
         let pointsToday = firestoreData["points_today"] as? Int
         let eventsTodayCount = firestoreData["events_today_count"] as? Int
         let pointsThisWeek = firestoreData["points_this_week"] as? Int
@@ -41,6 +42,7 @@ extension CurrentExperiencePointsData {
         self.init(
             experienceKey: experienceKey,
             userId: userId,
+            pointsAllTime: pointsAllTime,
             pointsToday: pointsToday,
             eventsTodayCount: eventsTodayCount,
             pointsThisWeek: pointsThisWeek,
@@ -64,6 +66,9 @@ extension CurrentExperiencePointsData {
 
         if let userId = self.userId {
             data["user_id"] = userId
+        }
+        if let pointsAllTime = self.pointsAllTime {
+            data["points_all_time"] = pointsAllTime
         }
         if let pointsToday = self.pointsToday {
             data["points_today"] = pointsToday
