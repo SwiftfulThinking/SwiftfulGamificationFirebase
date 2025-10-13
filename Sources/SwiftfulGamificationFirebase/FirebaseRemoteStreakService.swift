@@ -38,7 +38,11 @@ public struct FirebaseRemoteStreakService: RemoteStreakService {
             .collection("data")
     }
 
-    public init(rootCollectionName: String = "swiftful_streaks") {
+    /// Initialize the Firebase Remote Streak Service
+    /// - Parameter rootCollectionName: The root Firestore collection where all streak data is stored.
+    ///   Each user's streak data will be stored under: `{rootCollectionName}/{userId}/{streakKey}/...`
+    ///   Example: "swiftful_streaks" → "swiftful_streaks/user123/daily/current_streak"
+    public init(rootCollectionName: String) {
         self.rootCollectionName = rootCollectionName
     }
 

@@ -22,7 +22,11 @@ public class FirebaseRemoteProgressService: RemoteProgressService {
             .collection(progressKey)
     }
 
-    public init(rootCollectionName: String = "swiftful_progress") {
+    /// Initialize the Firebase Remote Progress Service
+    /// - Parameter rootCollectionName: The root Firestore collection where all progress data is stored.
+    ///   Each user's progress data will be stored under: `{rootCollectionName}/{userId}/{progressKey}/...`
+    ///   Example: "swiftful_progress" → "swiftful_progress/user123/general/{progressItemId}"
+    public init(rootCollectionName: String) {
         self.rootCollectionName = rootCollectionName
     }
 

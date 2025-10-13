@@ -32,7 +32,11 @@ public struct FirebaseRemoteExperiencePointsService: RemoteExperiencePointsServi
             .collection("data")
     }
 
-    public init(rootCollectionName: String = "swiftful_experience") {
+    /// Initialize the Firebase Remote Experience Points Service
+    /// - Parameter rootCollectionName: The root Firestore collection where all experience points data is stored.
+    ///   Each user's XP data will be stored under: `{rootCollectionName}/{userId}/{experienceKey}/...`
+    ///   Example: "swiftful_experience" → "swiftful_experience/user123/general/current_xp"
+    public init(rootCollectionName: String) {
         self.rootCollectionName = rootCollectionName
     }
 
