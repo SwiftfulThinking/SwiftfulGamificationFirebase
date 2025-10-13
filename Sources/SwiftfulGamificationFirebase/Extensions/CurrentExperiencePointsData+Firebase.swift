@@ -15,7 +15,7 @@ extension CurrentExperiencePointsData {
     public init(firestoreData: [String: Any]) throws {
         // Parse recent events if present
         let recentEvents: [ExperiencePointsEvent]?
-        if let eventsArray = firestoreData[CodingKeys.recentEvents.rawValue] as? [[String: Any]] {
+        if let eventsArray = firestoreData["recent_events"] as? [[String: Any]] {
             recentEvents = try eventsArray.compactMap { eventData in
                 try ExperiencePointsEvent(firestoreData: eventData)
             }
@@ -23,14 +23,35 @@ extension CurrentExperiencePointsData {
             recentEvents = nil
         }
 
+        // Extract values to help compiler
+        let experienceKey = firestoreData["experience_id"] as? String ?? ""
+        let userId = firestoreData["user_id"] as? String
+        let pointsToday = firestoreData["points_today"] as? Int
+        let eventsTodayCount = firestoreData["events_today_count"] as? Int
+        let pointsThisWeek = firestoreData["points_this_week"] as? Int
+        let pointsLast7Days = firestoreData["points_last_7_days"] as? Int
+        let pointsThisMonth = firestoreData["points_this_month"] as? Int
+        let pointsLast30Days = firestoreData["points_last_30_days"] as? Int
+        let pointsThisYear = firestoreData["points_this_year"] as? Int
+        let pointsLast12Months = firestoreData["points_last_12_months"] as? Int
+        let lastEventDate = (firestoreData["last_event_date"] as? Timestamp)?.dateValue()
+        let createdAt = (firestoreData["created_at"] as? Timestamp)?.dateValue()
+        let updatedAt = (firestoreData["updated_at"] as? Timestamp)?.dateValue()
+
         self.init(
-            experienceKey: firestoreData[CodingKeys.experienceKey.rawValue] as? String ?? "",
-            totalPoints: firestoreData[CodingKeys.totalPoints.rawValue] as? Int,
-            totalEvents: firestoreData[CodingKeys.totalEvents.rawValue] as? Int,
-            todayEventCount: firestoreData[CodingKeys.todayEventCount.rawValue] as? Int,
-            lastEventDate: (firestoreData[CodingKeys.lastEventDate.rawValue] as? Timestamp)?.dateValue(),
-            createdAt: (firestoreData[CodingKeys.createdAt.rawValue] as? Timestamp)?.dateValue(),
-            updatedAt: (firestoreData[CodingKeys.updatedAt.rawValue] as? Timestamp)?.dateValue(),
+            experienceKey: experienceKey,
+            userId: userId,
+            pointsToday: pointsToday,
+            eventsTodayCount: eventsTodayCount,
+            pointsThisWeek: pointsThisWeek,
+            pointsLast7Days: pointsLast7Days,
+            pointsThisMonth: pointsThisMonth,
+            pointsLast30Days: pointsLast30Days,
+            pointsThisYear: pointsThisYear,
+            pointsLast12Months: pointsLast12Months,
+            lastEventDate: lastEventDate,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
             recentEvents: recentEvents
         )
     }
@@ -38,29 +59,47 @@ extension CurrentExperiencePointsData {
     /// Convert to Firestore document data
     public var firestoreData: [String: Any] {
         var data: [String: Any] = [
-            CodingKeys.experienceKey.rawValue: experienceKey
+            "experience_id": experienceKey
         ]
 
-        if let totalPoints = totalPoints {
-            data[CodingKeys.totalPoints.rawValue] = totalPoints
+        if let userId = self.userId {
+            data["user_id"] = userId
         }
-        if let totalEvents = totalEvents {
-            data[CodingKeys.totalEvents.rawValue] = totalEvents
+        if let pointsToday = self.pointsToday {
+            data["points_today"] = pointsToday
         }
-        if let todayEventCount = todayEventCount {
-            data[CodingKeys.todayEventCount.rawValue] = todayEventCount
+        if let eventsTodayCount = self.eventsTodayCount {
+            data["events_today_count"] = eventsTodayCount
         }
-        if let lastEventDate = lastEventDate {
-            data[CodingKeys.lastEventDate.rawValue] = Timestamp(date: lastEventDate)
+        if let pointsThisWeek = self.pointsThisWeek {
+            data["points_this_week"] = pointsThisWeek
         }
-        if let createdAt = createdAt {
-            data[CodingKeys.createdAt.rawValue] = Timestamp(date: createdAt)
+        if let pointsLast7Days = self.pointsLast7Days {
+            data["points_last_7_days"] = pointsLast7Days
         }
-        if let updatedAt = updatedAt {
-            data[CodingKeys.updatedAt.rawValue] = Timestamp(date: updatedAt)
+        if let pointsThisMonth = self.pointsThisMonth {
+            data["points_this_month"] = pointsThisMonth
         }
-        if let recentEvents = recentEvents {
-            data[CodingKeys.recentEvents.rawValue] = recentEvents.map { $0.firestoreData }
+        if let pointsLast30Days = self.pointsLast30Days {
+            data["points_last_30_days"] = pointsLast30Days
+        }
+        if let pointsThisYear = self.pointsThisYear {
+            data["points_this_year"] = pointsThisYear
+        }
+        if let pointsLast12Months = self.pointsLast12Months {
+            data["points_last_12_months"] = pointsLast12Months
+        }
+        if let lastEventDate = self.lastEventDate {
+            data["last_event_date"] = Timestamp(date: lastEventDate)
+        }
+        if let createdAt = self.createdAt {
+            data["created_at"] = Timestamp(date: createdAt)
+        }
+        if let updatedAt = self.updatedAt {
+            data["updated_at"] = Timestamp(date: updatedAt)
+        }
+        if let recentEvents = self.recentEvents {
+            data["recent_events"] = recentEvents.map { $0.firestoreData }
         }
 
         return data
