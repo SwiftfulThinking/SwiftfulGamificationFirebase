@@ -23,6 +23,16 @@ extension CurrentStreakData {
             recentEvents = nil
         }
 
+        // Parse freezes available if present
+        let freezesAvailable: [StreakFreeze]?
+        if let freezesArray = firestoreData[CodingKeys.freezesAvailable.rawValue] as? [[String: Any]] {
+            freezesAvailable = try freezesArray.compactMap { freezeData in
+                try StreakFreeze(firestoreData: freezeData)
+            }
+        } else {
+            freezesAvailable = nil
+        }
+
         self.init(
             streakKey: firestoreData[CodingKeys.streakKey.rawValue] as? String ?? "",
             currentStreak: firestoreData[CodingKeys.currentStreak.rawValue] as? Int,
@@ -31,7 +41,8 @@ extension CurrentStreakData {
             lastEventTimezone: firestoreData[CodingKeys.lastEventTimezone.rawValue] as? String,
             streakStartDate: (firestoreData[CodingKeys.streakStartDate.rawValue] as? Timestamp)?.dateValue(),
             totalEvents: firestoreData[CodingKeys.totalEvents.rawValue] as? Int,
-            freezesRemaining: firestoreData[CodingKeys.freezesRemaining.rawValue] as? Int,
+            freezesAvailable: freezesAvailable,
+            freezesAvailableCount: firestoreData[CodingKeys.freezesAvailableCount.rawValue] as? Int,
             createdAt: (firestoreData[CodingKeys.createdAt.rawValue] as? Timestamp)?.dateValue(),
             updatedAt: (firestoreData[CodingKeys.updatedAt.rawValue] as? Timestamp)?.dateValue(),
             eventsRequiredPerDay: firestoreData[CodingKeys.eventsRequiredPerDay.rawValue] as? Int,
@@ -64,8 +75,11 @@ extension CurrentStreakData {
         if let totalEvents = totalEvents {
             data[CodingKeys.totalEvents.rawValue] = totalEvents
         }
-        if let freezesRemaining = freezesRemaining {
-            data[CodingKeys.freezesRemaining.rawValue] = freezesRemaining
+        if let freezesAvailable = freezesAvailable {
+            data[CodingKeys.freezesAvailable.rawValue] = freezesAvailable.map { $0.firestoreData }
+        }
+        if let freezesAvailableCount = freezesAvailableCount {
+            data[CodingKeys.freezesAvailableCount.rawValue] = freezesAvailableCount
         }
         if let createdAt = createdAt {
             data[CodingKeys.createdAt.rawValue] = Timestamp(date: createdAt)
