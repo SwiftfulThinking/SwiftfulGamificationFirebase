@@ -13,8 +13,10 @@ import SwiftfulGamification
 @MainActor
 public struct FirebaseRemoteExperiencePointsService: RemoteExperiencePointsService {
 
+    private let rootCollectionName: String
+
     private func userExperienceCollection(userId: String, experienceKey: String) -> CollectionReference {
-        Firestore.firestore().collection("swiftful_experience")
+        Firestore.firestore().collection(rootCollectionName)
             .document(userId)
             .collection(experienceKey)
     }
@@ -30,7 +32,8 @@ public struct FirebaseRemoteExperiencePointsService: RemoteExperiencePointsServi
             .collection("data")
     }
 
-    public init() {
+    public init(rootCollectionName: String = "swiftful_experience") {
+        self.rootCollectionName = rootCollectionName
     }
 
     // MARK: - Current Experience Points

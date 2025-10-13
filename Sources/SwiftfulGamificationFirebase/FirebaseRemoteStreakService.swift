@@ -13,8 +13,10 @@ import SwiftfulGamification
 @MainActor
 public struct FirebaseRemoteStreakService: RemoteStreakService {
 
+    private let rootCollectionName: String
+
     private func userStreakCollection(userId: String, streakKey: String) -> CollectionReference {
-        Firestore.firestore().collection("swiftful_streaks")
+        Firestore.firestore().collection(rootCollectionName)
             .document(userId)
             .collection(streakKey)
     }
@@ -36,7 +38,8 @@ public struct FirebaseRemoteStreakService: RemoteStreakService {
             .collection("data")
     }
 
-    public init() {
+    public init(rootCollectionName: String = "swiftful_streaks") {
+        self.rootCollectionName = rootCollectionName
     }
 
     // MARK: - Current Streak

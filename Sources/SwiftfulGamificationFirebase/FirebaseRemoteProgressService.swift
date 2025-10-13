@@ -13,15 +13,17 @@ import SwiftfulGamification
 @MainActor
 public class FirebaseRemoteProgressService: RemoteProgressService {
 
+    private let rootCollectionName: String
     private var listenerTask: Task<Void, Never>?
 
     private func userProgressCollection(userId: String, progressKey: String) -> CollectionReference {
-        Firestore.firestore().collection("swiftful_progress")
+        Firestore.firestore().collection(rootCollectionName)
             .document(userId)
             .collection(progressKey)
     }
 
-    public init() {
+    public init(rootCollectionName: String = "swiftful_progress") {
+        self.rootCollectionName = rootCollectionName
     }
 
     // MARK: - Progress Items
