@@ -87,7 +87,7 @@ public class FirebaseRemoteProgressService: RemoteProgressService {
 
     public func addProgress(userId: String, progressKey: String, item: ProgressItem) async throws {
         try userProgressCollection(userId: userId, progressKey: progressKey)
-            .document(item.id)
+            .document(item.sanitizedId)
             .setData(from: item, merge: true)
     }
 
