@@ -58,6 +58,7 @@ interface CalculateExperiencePointsRequest {
   experienceKey: string;
   configuration: ExperiencePointsConfiguration;
   rootCollectionName?: string; // Optional, defaults to 'swiftful_experience_points'
+  timezone?: string; // Optional, defaults to last event's timezone or 'UTC'
 }
 
 // ============================================================================
@@ -424,7 +425,7 @@ function getYearInterval(date: Date, timezone: string): { start: Date; end: Date
  */
 export const calculateExperiencePoints = onCall<CalculateExperiencePointsRequest>(
   async (request) => {
-    const { userId, experienceKey, configuration, rootCollectionName = 'swiftful_experience_points' } = request.data;
+    const { userId, experienceKey, configuration, rootCollectionName = 'swiftful_experience_points', timezone: requestTimezone } = request.data;
 
     // Validate input
     if (!userId || !experienceKey || !configuration) {
@@ -440,7 +441,8 @@ export const calculateExperiencePoints = onCall<CalculateExperiencePointsRequest
 
       // Calculate experience points (same as client-side lines 183-187)
       const currentDate = new Date();
-      const timezone = 'UTC'; // Default to UTC, can be customized per user if needed
+      // Use passed timezone or default to UTC (events don't store timezone like StreakEvents do)
+      const timezone = requestTimezone || 'UTC';
 
       const calculatedData = calculateExperiencePoints(
         events,

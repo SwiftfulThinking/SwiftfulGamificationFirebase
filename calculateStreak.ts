@@ -75,6 +75,7 @@ interface CalculateStreakRequest {
   streakKey: string;
   configuration: StreakConfiguration;
   rootCollectionName?: string; // Optional, defaults to 'swiftful_streaks'
+  timezone?: string; // Optional, defaults to last event's timezone or 'UTC'
 }
 
 // ============================================================================
@@ -286,7 +287,7 @@ function calculateGapDays(
   const today = getStartOfDay(currentDate, timezone);
 
   // Calculate how many days need to be filled (excluding today)
-  const daysSinceLastEvent = getDaysBetween(lastEventDay, today);
+  const daysSinceLastEvent = getDaysBetween(lastEventDay, today, timezone);
   const daysToFill = Math.max(0, daysSinceLastEvent - 1);
 
   if (daysToFill <= 0) {
@@ -429,7 +430,7 @@ function calculateStreak(
     const today = getStartOfDay(currentDate, timezone);
 
     // Calculate gap between last event and today
-    const daysSinceLastEvent = getDaysBetween(lastEventDay, today);
+    const daysSinceLastEvent = getDaysBetween(lastEventDay, today, timezone);
     const daysToFill = Math.max(0, daysSinceLastEvent - 1);
 
     // Only auto-consume if there's a gap AND we have enough freezes to fill the entire gap
@@ -463,7 +464,7 @@ function calculateStreak(
       hasStartedStreak = true;
     } else if (eventDay < expectedDate) {
       // Gap found - calculate gap size
-      const daysBetween = getDaysBetween(eventDay, expectedDate);
+      const daysBetween = getDaysBetween(eventDay, expectedDate, timezone);
 
       // EDGE CASE FIX: If we haven't started counting yet (no event today) and gap is only 1 day,
       // this is the "at risk" state - yesterday's event should still count
@@ -503,7 +504,7 @@ function calculateStreak(
     const hasRealEvents = dayEvents.some(e => !e.is_freeze);
 
     if (previousDay !== null) {
-      const dayDiff = getDaysBetween(previousDay, eventDay);
+      const dayDiff = getDaysBetween(previousDay, eventDay, timezone);
       if (dayDiff === 1) {
         if (hasRealEvents) {
           tempStreak += 1;
@@ -607,10 +608,10 @@ function isDateInSameDay(date1: Date, date2: Date, timezone: string): boolean {
 /**
  * Get number of days between two dates
  */
-function getDaysBetween(startDate: Date, endDate: Date): number {
+function getDaysBetween(startDate: Date, endDate: Date, timezone: string): number {
   const msPerDay = 24 * 60 * 60 * 1000;
-  const start = getStartOfDay(startDate, 'UTC');
-  const end = getStartOfDay(endDate, 'UTC');
+  const start = getStartOfDay(startDate, timezone);
+  const end = getStartOfDay(endDate, timezone);
   return Math.round((end.getTime() - start.getTime()) / msPerDay);
 }
 
@@ -663,7 +664,7 @@ function generateUUID(): string {
  */
 export const calculateStreak = onCall<CalculateStreakRequest>(
   async (request) => {
-    const { userId, streakKey, configuration, rootCollectionName = 'swiftful_streaks' } = request.data;
+    const { userId, streakKey, configuration, rootCollectionName = 'swiftful_streaks', timezone: requestTimezone } = request.data;
 
     // Validate input
     if (!userId || !streakKey || !configuration) {
@@ -680,9 +681,10 @@ export const calculateStreak = onCall<CalculateStreakRequest>(
 
       // Calculate streak (same as client-side lines 292-297)
       const currentDate = new Date();
-      const timezone = events.length > 0
-        ? events[events.length - 1].timezone
-        : 'UTC';
+      // Use passed timezone, or fallback to last event's timezone, or fallback to UTC
+      const timezone = requestTimezone
+        || (events.length > 0 ? events[events.length - 1].timezone : null)
+        || 'UTC';
 
       const { streak: calculatedStreak, freezeConsumptions } = calculateStreak(
         events,
