@@ -330,13 +330,34 @@ function calculateExperiencePoints(
 
 /**
  * Get start of day in a specific timezone
+ * Returns a Date representing midnight (00:00:00) in the specified timezone
+ *
+ * This matches Swift's calendar.startOfDay(for:) behavior:
+ * Takes any date and returns the UTC timestamp that represents midnight in the given timezone
+ *
+ * Based on: https://stackoverflow.com/questions/36031220
  */
 function getStartOfDay(date: Date, timezone: string): Date {
-  // Use Intl API to get timezone-aware start of day
-  const dateStr = date.toLocaleString('en-US', { timeZone: timezone });
-  const localDate = new Date(dateStr);
-  localDate.setHours(0, 0, 0, 0);
-  return localDate;
+  // Get the hour, minute, and second components in the target timezone
+  const parts = Intl.DateTimeFormat('en-US', {
+    timeZone: timezone,
+    hourCycle: 'h23',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric'
+  }).formatToParts(date);
+
+  const hour = parseInt(parts.find(p => p.type === 'hour')!.value);
+  const minute = parseInt(parts.find(p => p.type === 'minute')!.value);
+  const second = parseInt(parts.find(p => p.type === 'second')!.value);
+
+  // Subtract the time components to get midnight in the target timezone
+  // This works because we're subtracting the timezone's local time from the UTC timestamp
+  return new Date(
+    1000 * Math.floor(
+      (date.getTime() - hour * 3600000 - minute * 60000 - second * 1000) / 1000
+    )
+  );
 }
 
 /**
