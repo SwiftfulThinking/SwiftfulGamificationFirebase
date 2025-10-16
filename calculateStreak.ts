@@ -374,7 +374,8 @@ function calculateStreak(
   }
 
   // GROUP EVENTS BY DAY
-  const eventsByDay = new Map<string, StreakEvent[]>();
+  // Map from ISO date string to { midnight: Date, events: StreakEvent[] }
+  const eventsByDay = new Map<string, { midnight: Date; events: StreakEvent[] }>();
 
   for (const event of events) {
     const eventDate = event.date_created.toDate();
@@ -382,22 +383,22 @@ function calculateStreak(
     const dayKey = dayStart.toISOString().split('T')[0];
 
     if (!eventsByDay.has(dayKey)) {
-      eventsByDay.set(dayKey, []);
+      eventsByDay.set(dayKey, { midnight: dayStart, events: [] });
     }
-    eventsByDay.get(dayKey)!.push(event);
+    eventsByDay.get(dayKey)!.events.push(event);
   }
 
   // GOAL-BASED MODE: Filter days that met the goal
   let qualifyingDays: Date[];
   if (configuration.events_required_per_day > 1) {
-    qualifyingDays = Array.from(eventsByDay.entries())
-      .filter(([_, dayEvents]) => dayEvents.length >= configuration.events_required_per_day)
-      .map(([dayKey, _]) => new Date(dayKey))
+    qualifyingDays = Array.from(eventsByDay.values())
+      .filter(day => day.events.length >= configuration.events_required_per_day)
+      .map(day => day.midnight)
       .sort((a, b) => a.getTime() - b.getTime());
   } else {
     // BASIC MODE: Any day with at least 1 event qualifies
-    qualifyingDays = Array.from(eventsByDay.keys())
-      .map(dayKey => new Date(dayKey))
+    qualifyingDays = Array.from(eventsByDay.values())
+      .map(day => day.midnight)
       .sort((a, b) => a.getTime() - b.getTime());
   }
 
@@ -455,7 +456,8 @@ function calculateStreak(
     if (isDateInSameDay(eventDay, expectedDate, timezone)) {
       // Only increment if this day has at least one non-freeze event
       const dayKey = getStartOfDay(eventDay, timezone).toISOString().split('T')[0];
-      const dayEvents = eventsByDay.get(dayKey) ?? [];
+      const dayData = eventsByDay.get(dayKey);
+      const dayEvents = dayData?.events ?? [];
       if (dayEvents.some(e => !e.is_freeze)) {
         currentStreak += 1;
       }
@@ -476,7 +478,8 @@ function calculateStreak(
       if (!hasStartedStreak && daysBetween === 1 && (checkingOnExpectedDay || leewayApplied)) {
         // Only increment if this day has at least one non-freeze event
         const dayKey = getStartOfDay(eventDay, timezone).toISOString().split('T')[0];
-        const dayEvents = eventsByDay.get(dayKey) ?? [];
+        const dayData = eventsByDay.get(dayKey);
+        const dayEvents = dayData?.events ?? [];
         if (dayEvents.some(e => !e.is_freeze)) {
           currentStreak += 1;
         }
@@ -500,7 +503,8 @@ function calculateStreak(
   for (const eventDay of qualifyingDays) {
     // Only count days with non-freeze events
     const dayKey = getStartOfDay(eventDay, timezone).toISOString().split('T')[0];
-    const dayEvents = eventsByDay.get(dayKey) ?? [];
+    const dayData = eventsByDay.get(dayKey);
+    const dayEvents = dayData?.events ?? [];
     const hasRealEvents = dayEvents.some(e => !e.is_freeze);
 
     if (previousDay !== null) {
