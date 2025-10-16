@@ -395,17 +395,34 @@ function getWeekInterval(date: Date, timezone: string): { start: Date; end: Date
 
 /**
  * Get month interval (1st to last day)
+ * Returns midnight on the 1st and 23:59:59 on the last day of the month in the target timezone
  */
 function getMonthInterval(date: Date, timezone: string): { start: Date; end: Date } | null {
   try {
-    const dateInTz = getStartOfDay(date, timezone);
+    // Get year/month/day in the target timezone
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone: timezone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    }).formatToParts(date);
 
-    // First day of month
-    const start = new Date(dateInTz.getFullYear(), dateInTz.getMonth(), 1);
+    const year = parseInt(parts.find(p => p.type === 'year')!.value);
+    const month = parseInt(parts.find(p => p.type === 'month')!.value);
 
-    // Last day of month
-    const end = new Date(dateInTz.getFullYear(), dateInTz.getMonth() + 1, 0);
-    end.setHours(23, 59, 59, 999);
+    // Create a date for the 1st of this month at noon in the target timezone
+    const firstDayNoon = new Date(Date.UTC(year, month - 1, 1, 12, 0, 0, 0));
+
+    // Get midnight on the 1st in the target timezone
+    const start = getStartOfDay(firstDayNoon, timezone);
+
+    // Last day of month: create a date for the 1st of next month, then subtract 1 day
+    const nextMonth = new Date(Date.UTC(year, month, 1, 12, 0, 0, 0));
+    const lastDayNoon = new Date(nextMonth.getTime() - (24 * 60 * 60 * 1000));
+
+    // Get midnight on the last day, then set to end of day
+    const endDayStart = getStartOfDay(lastDayNoon, timezone);
+    const end = new Date(endDayStart.getTime() + (24 * 60 * 60 * 1000) - 1);
 
     return { start, end };
   } catch {
@@ -415,17 +432,30 @@ function getMonthInterval(date: Date, timezone: string): { start: Date; end: Dat
 
 /**
  * Get year interval (January 1st to December 31st)
+ * Returns midnight on Jan 1st and 23:59:59 on Dec 31st in the target timezone
  */
 function getYearInterval(date: Date, timezone: string): { start: Date; end: Date } | null {
   try {
-    const dateInTz = getStartOfDay(date, timezone);
+    // Get year in the target timezone
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone: timezone,
+      year: 'numeric'
+    }).formatToParts(date);
 
-    // First day of year
-    const start = new Date(dateInTz.getFullYear(), 0, 1);
+    const year = parseInt(parts.find(p => p.type === 'year')!.value);
 
-    // Last day of year
-    const end = new Date(dateInTz.getFullYear(), 11, 31);
-    end.setHours(23, 59, 59, 999);
+    // Create a date for Jan 1st at noon in the target timezone
+    const jan1Noon = new Date(Date.UTC(year, 0, 1, 12, 0, 0, 0));
+
+    // Get midnight on Jan 1st in the target timezone
+    const start = getStartOfDay(jan1Noon, timezone);
+
+    // Create a date for Dec 31st at noon
+    const dec31Noon = new Date(Date.UTC(year, 11, 31, 12, 0, 0, 0));
+
+    // Get midnight on Dec 31st, then set to end of day
+    const endDayStart = getStartOfDay(dec31Noon, timezone);
+    const end = new Date(endDayStart.getTime() + (24 * 60 * 60 * 1000) - 1);
 
     return { start, end };
   } catch {
