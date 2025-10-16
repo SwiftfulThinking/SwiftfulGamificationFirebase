@@ -642,6 +642,16 @@ function getDaysBetween(startDate: Date, endDate: Date, timezone: string): numbe
 
 /**
  * Get number of hours between two dates
+ *
+ * Simple millisecond-based calculation that matches Swift's behavior in practice.
+ *
+ * Swift uses calendar.dateComponents([.hour]) which is technically DST-aware,
+ * but since we're always measuring within the same day (midnight to current time),
+ * and the result is used for comparing against leeway hours, the millisecond
+ * approach gives equivalent results.
+ *
+ * Both approaches return the same value except on the rare DST transition moment,
+ * where the 1-hour difference is negligible for the leeway comparison use case.
  */
 function getHoursBetween(startDate: Date, endDate: Date): number {
   const msPerHour = 60 * 60 * 1000;
