@@ -30,6 +30,7 @@ let package = Package(
                 .product(name: "SwiftfulGamification", package: "SwiftfulGamification"),
                 .product(name: "SwiftfulFirestore", package: "SwiftfulFirestore"),
                 .product(name: "FirebaseAuth", package: "firebase-ios-sdk"),
+                .product(name: "FirebaseFunctions", package: "firebase-ios-sdk"),
             ]
         ),
         .testTarget(

@@ -7,6 +7,7 @@
 
 import Foundation
 import FirebaseFirestore
+import FirebaseFunctions
 import SwiftfulFirestore
 import SwiftfulGamification
 
@@ -14,6 +15,7 @@ import SwiftfulGamification
 public struct FirebaseRemoteStreakService: RemoteStreakService {
 
     private let rootCollectionName: String
+    private let calculateStreakCloudFunctionName: String?
 
     private func userStreakCollection(userId: String, streakKey: String) -> CollectionReference {
         Firestore.firestore().collection(rootCollectionName)
@@ -39,11 +41,18 @@ public struct FirebaseRemoteStreakService: RemoteStreakService {
     }
 
     /// Initialize the Firebase Remote Streak Service
-    /// - Parameter rootCollectionName: The root Firestore collection where all streak data is stored.
-    ///   Each user's streak data will be stored under: `{rootCollectionName}/{userId}/{streakKey}/...`
-    ///   Example: "swiftful_streaks" → "swiftful_streaks/user123/daily/current_streak"
-    public init(rootCollectionName: String) {
+    /// - Parameters:
+    ///   - rootCollectionName: The root Firestore collection where all streak data is stored.
+    ///     Each user's streak data will be stored under: `{rootCollectionName}/{userId}/{streakKey}/...`
+    ///     Example: "swiftful_streaks" → "swiftful_streaks/user123/daily/current_streak"
+    ///   - calculateStreakCloudFunctionName: Cloud Function name for server-side streak calculation (e.g., "calculateStreak").
+    ///     Required if useServerCalculation = true in StreakConfiguration.
+    public init(
+        rootCollectionName: String,
+        calculateStreakCloudFunctionName: String? = nil
+    ) {
         self.rootCollectionName = rootCollectionName
+        self.calculateStreakCloudFunctionName = calculateStreakCloudFunctionName
     }
 
     // MARK: - Current Streak
@@ -57,16 +66,36 @@ public struct FirebaseRemoteStreakService: RemoteStreakService {
         try currentStreakDoc(userId: userId, streakKey: streakKey).setData(from: streak, merge: true)
     }
 
-    public func calculateStreak(userId: String, streakKey: String) async throws {
-        // Trigger Cloud Function for server-side calculation
-        // Implementation depends on your Cloud Function setup
-        // For now, this is a placeholder that writes a trigger flag
+    public func calculateStreak(userId: String, streakKey: String, eventsRequiredPerDay: Int, leewayHours: Int, freezeBehavior: FreezeBehavior, timezone: String?) async throws {
+        precondition(
+            calculateStreakCloudFunctionName != nil,
+            "calculateStreakCloudFunctionName must be provided in init when useServerCalculation = true"
+        )
 
-//         let functions = Functions.functions()
-//         let result = try await functions.httpsCallable("calculateStreak").call([
-//             "userId": userId,
-//             "streakKey": streakKey
-//         ])
+        guard let cloudFunctionName = calculateStreakCloudFunctionName else {
+            throw URLError(.badURL)
+        }
+
+        let functions = Functions.functions()
+
+        var parameters: [String: Any] = [
+            "userId": userId,
+            "streakKey": streakKey,
+            "configuration": [
+                "streak_id": streakKey,
+                "events_required_per_day": eventsRequiredPerDay,
+                "use_server_calculation": true,
+                "leeway_hours": leewayHours,
+                "freeze_behavior": freezeBehavior.rawValue
+            ],
+            "rootCollectionName": rootCollectionName
+        ]
+
+        if let timezone = timezone {
+            parameters["timezone"] = timezone
+        }
+
+        let _ = try await functions.httpsCallable(cloudFunctionName).call(parameters)
     }
 
     // MARK: - Events
