@@ -183,12 +183,12 @@ function getRecentEvents(
 }
 
 /**
- * Main experience points calculation function
+ * Main experience points calculation function (internal)
  * Mirrors: ExperiencePointsCalculator.calculateExperiencePoints()
  *
  * This is the EXACT same logic as the Swift implementation
  */
-function calculateExperiencePoints(
+function calculateExperiencePointsInternal(
   events: ExperiencePointsEvent[],
   configuration: ExperiencePointsConfiguration,
   userId: string | undefined,
@@ -495,7 +495,7 @@ export const calculateExperiencePoints = onCall<CalculateExperiencePointsRequest
       // Use passed timezone or default to UTC (events don't store timezone like StreakEvents do)
       const timezone = requestTimezone || 'UTC';
 
-      const calculatedData = calculateExperiencePoints(
+      const calculatedData = calculateExperiencePointsInternal(
         events,
         configuration,
         userId,

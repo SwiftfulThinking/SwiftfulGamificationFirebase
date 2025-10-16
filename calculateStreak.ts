@@ -13,7 +13,7 @@
  */
 
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
-import { getFirestore, Timestamp, FieldValue } from 'firebase-admin/firestore';
+import { getFirestore, Timestamp } from 'firebase-admin/firestore';
 import { initializeApp } from 'firebase-admin/app';
 
 // Initialize Firebase Admin
@@ -308,46 +308,12 @@ function calculateGapDays(
 }
 
 /**
- * Select freezes to consume for specific days using FIFO (First In First Out) ordering
- * Mirrors: StreakCalculator.selectFreezesForDays()
- */
-function selectFreezesForDays(
-  daysToFill: Date[],
-  availableFreezes: StreakFreeze[]
-): FreezeConsumption[] {
-  if (daysToFill.length === 0 || availableFreezes.length === 0) {
-    return [];
-  }
-
-  // Sort freezes FIFO - oldest first (by date_earned)
-  const sortedFreezes = [...availableFreezes].sort((a, b) => {
-    const aDate = a.date_earned?.toMillis() ?? 0;
-    const bDate = b.date_earned?.toMillis() ?? 0;
-    return aDate - bDate;
-  });
-
-  // Take as many freezes as we have days (or all available freezes if fewer)
-  const freezesToUse = sortedFreezes.slice(0, daysToFill.length);
-
-  // Map each freeze to its corresponding day
-  const consumptions: FreezeConsumption[] = [];
-  for (let i = 0; i < freezesToUse.length; i++) {
-    consumptions.push({
-      freezeId: freezesToUse[i].id,
-      date: daysToFill[i]
-    });
-  }
-
-  return consumptions;
-}
-
-/**
- * Main streak calculation function
+ * Main streak calculation function (internal)
  * Mirrors: StreakCalculator.calculateStreak()
  *
  * This is the EXACT same logic as the Swift implementation
  */
-function calculateStreak(
+function calculateStreakInternal(
   events: StreakEvent[],
   freezes: StreakFreeze[],
   configuration: StreakConfiguration,
@@ -723,7 +689,7 @@ export const calculateStreak = onCall<CalculateStreakRequest>(
         || (events.length > 0 ? events[events.length - 1].timezone : null)
         || 'UTC';
 
-      const { streak: calculatedStreak, freezeConsumptions } = calculateStreak(
+      const { streak: calculatedStreak, freezeConsumptions } = calculateStreakInternal(
         events,
         freezes,
         configuration,
@@ -754,7 +720,7 @@ export const calculateStreak = onCall<CalculateStreakRequest>(
         const updatedEvents = await getAllEvents(rootCollectionName, userId, streakKey);
         const updatedFreezes = await getAllStreakFreezes(rootCollectionName, userId, streakKey);
 
-        const { streak: finalStreak } = calculateStreak(
+        const { streak: finalStreak } = calculateStreakInternal(
           updatedEvents,
           updatedFreezes,
           configuration,
