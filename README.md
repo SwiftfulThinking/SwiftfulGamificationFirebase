@@ -52,6 +52,65 @@ progressManager.getProgress(id: "item_id")
 await progressManager.logOut()
 ```
 
+## Server Calculations (Optional)
+
+<details>
+<summary> Details (Click to expand) </summary>
+<br>
+
+The `ServerCalculations/` folder contains Firebase Cloud Functions for server-side streak and XP calculations.
+
+### Deploy Cloud Functions
+
+```bash
+# Copy functions to your Firebase project
+cp -r ServerCalculations/calculateStreak.ts your-firebase-project/functions/src/
+cp -r ServerCalculations/calculateExperiencePoints.ts your-firebase-project/functions/src/
+
+# Deploy to Firebase
+cd your-firebase-project
+firebase deploy --only functions
+```
+
+### Enable Server Calculation
+
+```swift
+// Streaks with server calculation
+let streakService = FirebaseRemoteStreakService(
+    rootCollectionName: "swiftful_streaks",
+    calculateStreakCloudFunctionName: "calculateStreak"  // Add function name
+)
+
+let streakManager = StreakManager(
+    services: FirebaseStreakServices(remote: streakService, local: FileManagerStreakPersistence()),
+    configuration: StreakConfiguration(
+        streakKey: "daily",
+        eventsRequiredPerDay: 1,
+        useServerCalculation: true,  // Enable server calculation
+        leewayHours: 4,
+        freezeBehavior: .autoConsumeFreezes
+    )
+)
+
+// Experience Points with server calculation
+let xpService = FirebaseRemoteExperiencePointsService(
+    rootCollectionName: "swiftful_experience_points",
+    calculateExperiencePointsCloudFunctionName: "calculateExperiencePoints"
+)
+
+let xpManager = ExperiencePointsManager(
+    services: FirebaseExperiencePointsServices(remote: xpService, local: FileManagerExperiencePointsPersistence()),
+    configuration: ExperiencePointsConfiguration(
+        experienceKey: "general",
+        useServerCalculation: true  // Enable server calculation
+    )
+)
+```
+
+**Note**: Server calculation is optional. By default, calculations run client-side for offline support and faster updates.
+
+</details>
+
 ## Firebase Firestore Setup
 
 <details>
