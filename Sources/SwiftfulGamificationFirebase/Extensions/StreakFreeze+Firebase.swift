@@ -15,28 +15,26 @@ extension StreakFreeze {
     public init(firestoreData: [String: Any]) throws {
         self.init(
             id: firestoreData[CodingKeys.id.rawValue] as? String ?? UUID().uuidString,
-            streakKey: firestoreData[CodingKeys.streakKey.rawValue] as? String ?? "",
-            earnedDate: (firestoreData[CodingKeys.earnedDate.rawValue] as? Timestamp)?.dateValue(),
-            usedDate: (firestoreData[CodingKeys.usedDate.rawValue] as? Timestamp)?.dateValue(),
-            expiresAt: (firestoreData[CodingKeys.expiresAt.rawValue] as? Timestamp)?.dateValue()
+            dateEarned: (firestoreData[CodingKeys.dateEarned.rawValue] as? Timestamp)?.dateValue(),
+            dateUsed: (firestoreData[CodingKeys.dateUsed.rawValue] as? Timestamp)?.dateValue(),
+            dateExpires: (firestoreData[CodingKeys.dateExpires.rawValue] as? Timestamp)?.dateValue()
         )
     }
 
     /// Convert to Firestore document data
     public var firestoreData: [String: Any] {
         var data: [String: Any] = [
-            CodingKeys.id.rawValue: id,
-            CodingKeys.streakKey.rawValue: streakKey
+            CodingKeys.id.rawValue: id
         ]
 
-        if let earnedDate = earnedDate {
-            data[CodingKeys.earnedDate.rawValue] = Timestamp(date: earnedDate)
+        if let dateEarned = dateEarned {
+            data[CodingKeys.dateEarned.rawValue] = Timestamp(date: dateEarned)
         }
-        if let usedDate = usedDate {
-            data[CodingKeys.usedDate.rawValue] = Timestamp(date: usedDate)
+        if let dateUsed = dateUsed {
+            data[CodingKeys.dateUsed.rawValue] = Timestamp(date: dateUsed)
         }
-        if let expiresAt = expiresAt {
-            data[CodingKeys.expiresAt.rawValue] = Timestamp(date: expiresAt)
+        if let dateExpires = dateExpires {
+            data[CodingKeys.dateExpires.rawValue] = Timestamp(date: dateExpires)
         }
 
         return data

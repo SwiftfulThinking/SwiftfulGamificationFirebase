@@ -106,7 +106,7 @@ public struct FirebaseRemoteStreakService: RemoteStreakService {
 
     public func getAllEvents(userId: String, streakKey: String) async throws -> [StreakEvent] {
         try await eventsCollection(userId: userId, streakKey: streakKey)
-            .order(by: StreakEvent.CodingKeys.timestamp.rawValue, descending: false)
+            .order(by: StreakEvent.CodingKeys.dateCreated.rawValue, descending: false)
             .getAllDocuments()
     }
 
@@ -122,13 +122,13 @@ public struct FirebaseRemoteStreakService: RemoteStreakService {
 
     public func useStreakFreeze(userId: String, streakKey: String, freezeId: String) async throws {
         try await freezesCollection(userId: userId, streakKey: streakKey).updateDocument(id: freezeId, dict: [
-            StreakFreeze.CodingKeys.usedDate.rawValue: Timestamp(date: Date())
+            StreakFreeze.CodingKeys.dateUsed.rawValue: Timestamp(date: Date())
         ])
     }
 
     public func getAllStreakFreezes(userId: String, streakKey: String) async throws -> [StreakFreeze] {
         try await freezesCollection(userId: userId, streakKey: streakKey)
-            .order(by: StreakFreeze.CodingKeys.earnedDate.rawValue, descending: false)
+            .order(by: StreakFreeze.CodingKeys.dateEarned.rawValue, descending: false)
             .getAllDocuments()
     }
 }

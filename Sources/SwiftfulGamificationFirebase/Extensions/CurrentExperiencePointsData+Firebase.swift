@@ -35,9 +35,9 @@ extension CurrentExperiencePointsData {
         let pointsLast30Days = firestoreData["points_last_30_days"] as? Int
         let pointsThisYear = firestoreData["points_this_year"] as? Int
         let pointsLast12Months = firestoreData["points_last_12_months"] as? Int
-        let lastEventDate = (firestoreData["last_event_date"] as? Timestamp)?.dateValue()
-        let createdAt = (firestoreData["created_at"] as? Timestamp)?.dateValue()
-        let updatedAt = (firestoreData["updated_at"] as? Timestamp)?.dateValue()
+        let dateLastEvent = (firestoreData["date_last_event"] as? Timestamp)?.dateValue()
+        let dateCreated = (firestoreData["date_created"] as? Timestamp)?.dateValue()
+        let dateUpdated = (firestoreData["date_updated"] as? Timestamp)?.dateValue()
 
         self.init(
             experienceKey: experienceKey,
@@ -51,9 +51,9 @@ extension CurrentExperiencePointsData {
             pointsLast30Days: pointsLast30Days,
             pointsThisYear: pointsThisYear,
             pointsLast12Months: pointsLast12Months,
-            lastEventDate: lastEventDate,
-            createdAt: createdAt,
-            updatedAt: updatedAt,
+            dateLastEvent: dateLastEvent,
+            dateCreated: dateCreated,
+            dateUpdated: dateUpdated,
             recentEvents: recentEvents
         )
     }
@@ -94,14 +94,14 @@ extension CurrentExperiencePointsData {
         if let pointsLast12Months = self.pointsLast12Months {
             data["points_last_12_months"] = pointsLast12Months
         }
-        if let lastEventDate = self.lastEventDate {
-            data["last_event_date"] = Timestamp(date: lastEventDate)
+        if let dateLastEvent = self.dateLastEvent {
+            data["date_last_event"] = Timestamp(date: dateLastEvent)
         }
-        if let createdAt = self.createdAt {
-            data["created_at"] = Timestamp(date: createdAt)
+        if let dateCreated = self.dateCreated {
+            data["date_created"] = Timestamp(date: dateCreated)
         }
-        if let updatedAt = self.updatedAt {
-            data["updated_at"] = Timestamp(date: updatedAt)
+        if let dateUpdated = self.dateUpdated {
+            data["date_updated"] = Timestamp(date: dateUpdated)
         }
         if let recentEvents = self.recentEvents {
             data["recent_events"] = recentEvents.map { $0.firestoreData }

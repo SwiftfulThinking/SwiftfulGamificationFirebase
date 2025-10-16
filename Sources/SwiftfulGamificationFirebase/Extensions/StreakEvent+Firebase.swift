@@ -20,7 +20,7 @@ extension StreakEvent {
 
         self.init(
             id: firestoreData[CodingKeys.id.rawValue] as? String ?? UUID().uuidString,
-            timestamp: (firestoreData[CodingKeys.timestamp.rawValue] as? Timestamp)?.dateValue() ?? Date(),
+            dateCreated: (firestoreData[CodingKeys.dateCreated.rawValue] as? Timestamp)?.dateValue() ?? Date(),
             timezone: firestoreData[CodingKeys.timezone.rawValue] as? String ?? TimeZone.current.identifier,
             isFreeze: firestoreData[CodingKeys.isFreeze.rawValue] as? Bool ?? false,
             freezeId: firestoreData[CodingKeys.freezeId.rawValue] as? String,
@@ -32,7 +32,7 @@ extension StreakEvent {
     public var firestoreData: [String: Any] {
         var data: [String: Any] = [
             CodingKeys.id.rawValue: id,
-            CodingKeys.timestamp.rawValue: Timestamp(date: timestamp),
+            CodingKeys.dateCreated.rawValue: Timestamp(date: dateCreated),
             CodingKeys.timezone.rawValue: timezone,
             CodingKeys.isFreeze.rawValue: isFreeze
         ]

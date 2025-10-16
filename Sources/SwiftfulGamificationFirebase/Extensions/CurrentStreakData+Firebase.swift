@@ -35,16 +35,17 @@ extension CurrentStreakData {
 
         self.init(
             streakKey: firestoreData[CodingKeys.streakKey.rawValue] as? String ?? "",
+            userId: firestoreData[CodingKeys.userId.rawValue] as? String,
             currentStreak: firestoreData[CodingKeys.currentStreak.rawValue] as? Int,
             longestStreak: firestoreData[CodingKeys.longestStreak.rawValue] as? Int,
-            lastEventDate: (firestoreData[CodingKeys.lastEventDate.rawValue] as? Timestamp)?.dateValue(),
+            dateLastEvent: (firestoreData[CodingKeys.dateLastEvent.rawValue] as? Timestamp)?.dateValue(),
             lastEventTimezone: firestoreData[CodingKeys.lastEventTimezone.rawValue] as? String,
-            streakStartDate: (firestoreData[CodingKeys.streakStartDate.rawValue] as? Timestamp)?.dateValue(),
+            dateStreakStart: (firestoreData[CodingKeys.dateStreakStart.rawValue] as? Timestamp)?.dateValue(),
             totalEvents: firestoreData[CodingKeys.totalEvents.rawValue] as? Int,
             freezesAvailable: freezesAvailable,
             freezesAvailableCount: firestoreData[CodingKeys.freezesAvailableCount.rawValue] as? Int,
-            createdAt: (firestoreData[CodingKeys.createdAt.rawValue] as? Timestamp)?.dateValue(),
-            updatedAt: (firestoreData[CodingKeys.updatedAt.rawValue] as? Timestamp)?.dateValue(),
+            dateCreated: (firestoreData[CodingKeys.dateCreated.rawValue] as? Timestamp)?.dateValue(),
+            dateUpdated: (firestoreData[CodingKeys.dateUpdated.rawValue] as? Timestamp)?.dateValue(),
             eventsRequiredPerDay: firestoreData[CodingKeys.eventsRequiredPerDay.rawValue] as? Int,
             todayEventCount: firestoreData[CodingKeys.todayEventCount.rawValue] as? Int,
             recentEvents: recentEvents
@@ -57,20 +58,23 @@ extension CurrentStreakData {
             CodingKeys.streakKey.rawValue: streakKey
         ]
 
+        if let userId = userId {
+            data[CodingKeys.userId.rawValue] = userId
+        }
         if let currentStreak = currentStreak {
             data[CodingKeys.currentStreak.rawValue] = currentStreak
         }
         if let longestStreak = longestStreak {
             data[CodingKeys.longestStreak.rawValue] = longestStreak
         }
-        if let lastEventDate = lastEventDate {
-            data[CodingKeys.lastEventDate.rawValue] = Timestamp(date: lastEventDate)
+        if let dateLastEvent = dateLastEvent {
+            data[CodingKeys.dateLastEvent.rawValue] = Timestamp(date: dateLastEvent)
         }
         if let lastEventTimezone = lastEventTimezone {
             data[CodingKeys.lastEventTimezone.rawValue] = lastEventTimezone
         }
-        if let streakStartDate = streakStartDate {
-            data[CodingKeys.streakStartDate.rawValue] = Timestamp(date: streakStartDate)
+        if let dateStreakStart = dateStreakStart {
+            data[CodingKeys.dateStreakStart.rawValue] = Timestamp(date: dateStreakStart)
         }
         if let totalEvents = totalEvents {
             data[CodingKeys.totalEvents.rawValue] = totalEvents
@@ -81,11 +85,11 @@ extension CurrentStreakData {
         if let freezesAvailableCount = freezesAvailableCount {
             data[CodingKeys.freezesAvailableCount.rawValue] = freezesAvailableCount
         }
-        if let createdAt = createdAt {
-            data[CodingKeys.createdAt.rawValue] = Timestamp(date: createdAt)
+        if let dateCreated = dateCreated {
+            data[CodingKeys.dateCreated.rawValue] = Timestamp(date: dateCreated)
         }
-        if let updatedAt = updatedAt {
-            data[CodingKeys.updatedAt.rawValue] = Timestamp(date: updatedAt)
+        if let dateUpdated = dateUpdated {
+            data[CodingKeys.dateUpdated.rawValue] = Timestamp(date: dateUpdated)
         }
         if let eventsRequiredPerDay = eventsRequiredPerDay {
             data[CodingKeys.eventsRequiredPerDay.rawValue] = eventsRequiredPerDay

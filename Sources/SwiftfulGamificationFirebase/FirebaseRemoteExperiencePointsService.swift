@@ -97,7 +97,7 @@ public struct FirebaseRemoteExperiencePointsService: RemoteExperiencePointsServi
 
     public func getAllEvents(userId: String, experienceKey: String) async throws -> [ExperiencePointsEvent] {
         try await eventsCollection(userId: userId, experienceKey: experienceKey)
-            .order(by: ExperiencePointsEvent.CodingKeys.timestamp.rawValue, descending: false)
+            .order(by: ExperiencePointsEvent.CodingKeys.dateCreated.rawValue, descending: false)
             .getAllDocuments()
     }
 
