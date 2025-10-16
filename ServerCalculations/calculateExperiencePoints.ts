@@ -14,10 +14,8 @@
 
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore, Timestamp } from 'firebase-admin/firestore';
-import { initializeApp } from 'firebase-admin/app';
 
-// Initialize Firebase Admin
-initializeApp();
+// NOTE: initializeApp() should be called in index.ts before importing this function
 
 // ============================================================================
 // MARK: - Type Definitions
