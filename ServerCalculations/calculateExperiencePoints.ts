@@ -72,8 +72,8 @@ function getCollectionRefs(rootCollectionName: string, userId: string, experienc
   const userExperienceCollection = db.collection(rootCollectionName).doc(userId).collection(experienceKey);
 
   return {
-    currentDataDoc: userExperienceCollection.doc('current_experience_points'),
-    eventsCollection: userExperienceCollection.doc('experience_points_events').collection('data')
+    currentDataDoc: userExperienceCollection.doc('current_xp'),
+    eventsCollection: userExperienceCollection.doc('xp_events').collection('data')
   };
 }
 
