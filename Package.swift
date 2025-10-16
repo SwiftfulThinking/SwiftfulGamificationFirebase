@@ -17,8 +17,8 @@ let package = Package(
     ],
     dependencies: [
         // Here we add the dependency for the SendableDictionary package
-        .package(url: "https://github.com/SwiftfulThinking/SwiftfulGamification.git", branch: "main"),
-        .package(url: "https://github.com/SwiftfulThinking/SwiftfulFirestore.git", branch: "development"), // "11.0.0"..<"12.0.0"
+        .package(url: "https://github.com/SwiftfulThinking/SwiftfulGamification.git", "1.0.0"..<"2.0.0"),
+        .package(url: "https://github.com/SwiftfulThinking/SwiftfulFirestore.git", "11.0.0"..<"12.0.0"), // "11.0.0"..<"12.0.0"
         .package(url: "https://github.com/firebase/firebase-ios-sdk.git", "12.0.0"..<"13.0.0"),
     ],
     targets: [

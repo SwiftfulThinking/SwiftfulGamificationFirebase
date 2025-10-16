@@ -1,5 +1,5 @@
 {
-  "originHash" : "edce35fa448b5145fd85ff486af5097a47549957bbb9c458778e74ba5396c48d",
+  "originHash" : "abf4a2f716ddd0323839e541697413b9cb058608c27d7bce2c39a85f5b7ecf03",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
@@ -141,8 +141,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SwiftfulThinking/SwiftfulFirestore.git",
       "state" : {
-        "branch" : "development",
-        "revision" : "056be03845cc8ed594555f74c36c856a35e32aa5"
+        "revision" : "288c869297fd3615ce8791f2740760d36b3b8db1",
+        "version" : "11.0.4"
       }
     },
     {
@@ -150,8 +150,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SwiftfulThinking/SwiftfulGamification.git",
       "state" : {
-        "branch" : "main",
-        "revision" : "68419237ddbab69fc073cf2bf78d75a2bc8cccac"
+        "revision" : "8a9e6a0a4eef6f7de86a9383318cee323fcdff7a",
+        "version" : "1.0.0"
       }
     }
   ],
